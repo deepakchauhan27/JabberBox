@@ -1,13 +1,14 @@
 import { useState } from 'react'
-
+import Register from './pages/Register'
 
 
 function App() {
   const [count, setCount] = useState(0)
 
+  
   return (
     <>
-      <div className='text-center bg-indigo-700'>Hello JAbbers</div>
+      <Register />
     </>
   )
 }
