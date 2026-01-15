@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import logo from "../images/Jabberbox_logo_new.png";
 
 const Login = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -20,9 +21,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-cyan-500 via-teal-500 to-emerald-500">
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
+
+      {/* {Logo} */}
+      <div className="absolute top-10 left-10">
+        <img className="h-20" src={logo} alt="JabberBox Logo" />
+      </div>
 
       {/* Login Card */}
       <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 z-10">

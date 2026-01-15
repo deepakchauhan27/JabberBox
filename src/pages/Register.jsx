@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import logo from "../images/Jabberbox_logo_new.png"
 
 const Register = () => {
   const navigate = useNavigate();
@@ -20,17 +21,17 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500">
+    <div className="min-h-screen flex items-center flex-row justify-center bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500">
       {/* Overlay */}
-      <div className=" flex absolute inset-0 bg-black/40"></div>
+      <div className="absolute inset-0 bg-black/40"></div>
 
       {/* {Logo} */}
       <div className="absolute top-10 left-10">
-        <img src="" alt="" />
+        <img className="h-20" src={logo} alt="JabberBox Logo" />
       </div>
 
       {/* Register Card */}
-      <div className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 z-10">
+      <div className="relative w-full max-w-md bg-white rounded-xl drop-shadow-amber-100 shadow-2xl p-8 z-10">
         <h2 className="text-3xl font-bold text-center text-gray-800">
           Create Account
         </h2>
