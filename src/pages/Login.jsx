@@ -10,24 +10,57 @@ const Login = () => {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    // Login API call will go here
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Login failed");
+        setLoading(false);
+        return;
+      }
+
+      // ✅ Success
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data));
+
+      // Redirect to chat page (create later)
+      navigate("/chat");
+    } catch (err) {
+      setError("Server not responding");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-cyan-500 via-teal-500 to-emerald-500">
-      {/* Dark overlay */}
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500">
+      
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 
-      {/* {Logo} */}
-      <div className="absolute top-10 left-10">
-        <img className="h-20" src={logo} alt="JabberBox Logo" />
+      {/* Logo */}
+      <div className="absolute top-6 left-6 md:top-10 md:left-10 z-10">
+        <img className="h-14 md:h-20" src={logo} alt="JabberBox Logo" />
       </div>
 
       {/* Login Card */}
@@ -35,10 +68,16 @@ const Login = () => {
         <h2 className="text-3xl font-bold text-center text-gray-800">
           Welcome Back
         </h2>
+
         <p className="text-center text-gray-500 mt-2">
-          Login to{" "}
-          <span className="font-semibold text-indigo-600">JabberBox</span>
+          Login to <span className="font-semibold text-indigo-600">JabberBox</span>
         </p>
+
+        {error && (
+          <p className="text-red-500 text-sm text-center mt-3">
+            {error}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <input
@@ -63,9 +102,14 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition"
+            disabled={loading}
+            className={`w-full py-3 text-white rounded-xl font-semibold transition ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700"
+            }`}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

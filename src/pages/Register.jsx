@@ -14,11 +14,39 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-    // API call will go here
-  };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      alert(data.message || "Registration failed");
+      return;
+    }
+
+    // ✅ Success
+    console.log("Registered:", data);
+
+    // Optional: store token
+    localStorage.setItem("token", data.token);
+
+    // Redirect to login (or chat later)
+    navigate("/");
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Something went wrong");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center flex-row justify-center bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500">
