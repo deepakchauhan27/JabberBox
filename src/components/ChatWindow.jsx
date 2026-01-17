@@ -1,52 +1,81 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MessageBubble from "./MessageBubble";
 
-const ChatWindow = ({ chat }) => {
-  const [message, setMessage] = useState("");
+const ChatWindow = ({ chat, socket }) => {
+  const [messages, setMessages] = useState([]);
+  const [text, setText] = useState("");
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    if (!chat) return;
+
+    socket.emit("joinChat", chat._id);
+
+    fetch(`http://localhost:5000/api/messages/${chat._id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(setMessages);
+  }, [chat]);
+
+  useEffect(() => {
+    socket.on("receiveMessage", (message) => {
+      setMessages(prev => [...prev, message]);
+    });
+
+    return () => socket.off("receiveMessage");
+  }, []);
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+
+    const res = await fetch("http://localhost:5000/api/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ chatId: chat._id, content: text })
+    });
+
+    const message = await res.json();
+
+    socket.emit("sendMessage", message);
+    setMessages(prev => [...prev, message]);
+    setText("");
+  };
 
   if (!chat) {
     return (
       <div className="flex-1 flex items-center justify-center text-gray-500">
-        Select a chat to start messaging
+        Select a chat
       </div>
     );
   }
 
-  const handleSend = (e) => {
-    e.preventDefault();
-    if (!message.trim()) return;
-    console.log("Send:", message);
-    setMessage("");
-  };
-
   return (
     <div className="flex-1 flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b bg-white font-semibold">
-        {chat.name}
+      <div className="flex-1 p-4 overflow-y-auto">
+        {messages.map(m => (
+          <MessageBubble
+            key={m._id}
+            text={m.content}
+            isOwn={
+              m.sender._id === JSON.parse(localStorage.getItem("user"))._id
+            }
+          />
+        ))}
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-        <MessageBubble text="Hello!" isOwn />
-        <MessageBubble text="Hi, how are you?" />
-      </div>
-
-      {/* Input */}
-      <form
-        onSubmit={handleSend}
-        className="p-4 flex gap-2 bg-white border-t"
-      >
+      <form onSubmit={sendMessage} className="p-4 flex gap-2 border-t">
         <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          className="flex-1 px-4 py-2 border rounded-full focus:outline-none"
+          value={text}
+          onChange={e => setText(e.target.value)}
+          className="flex-1 border rounded-full px-4 py-2"
           placeholder="Type a message"
         />
-        <button
-          type="submit"
-          className="bg-indigo-600 text-white px-6 rounded-full"
-        >
+        <button className="bg-indigo-600 text-white px-6 rounded-full">
           Send
         </button>
       </form>
