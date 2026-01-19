@@ -1,81 +1,100 @@
 import { useEffect, useState } from "react";
 import MessageBubble from "./MessageBubble";
 
-const ChatWindow = ({ chat, socket }) => {
+const ChatWindow = ({ chat }) => {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+
   const token = localStorage.getItem("token");
+  const loggedUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     if (!chat) return;
 
-    socket.emit("joinChat", chat._id);
+    const fetchMessages = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/messages/${chat._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-    fetch(`http://localhost:5000/api/messages/${chat._id}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(setMessages);
+        const data = await res.json();
+        setMessages(data);
+      } catch (err) {
+        console.error("Failed to fetch messages", err);
+      }
+    };
+
+    fetchMessages();
   }, [chat]);
-
-  useEffect(() => {
-    socket.on("receiveMessage", (message) => {
-      setMessages(prev => [...prev, message]);
-    });
-
-    return () => socket.off("receiveMessage");
-  }, []);
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!text.trim()) return;
+    if (!text.trim() || !chat) return;
 
-    const res = await fetch("http://localhost:5000/api/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ chatId: chat._id, content: text })
-    });
+    try {
+      const res = await fetch("http://localhost:5000/api/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          chatId: chat._id,
+          content: text,
+        }),
+      });
 
-    const message = await res.json();
-
-    socket.emit("sendMessage", message);
-    setMessages(prev => [...prev, message]);
-    setText("");
+      const newMessage = await res.json();
+      setMessages((prev) => [...prev, newMessage]);
+      setText("");
+    } catch (err) {
+      console.error("Send message failed", err);
+    }
   };
 
-  if (!chat) {
-    return (
-      <div className="flex-1 flex items-center justify-center text-gray-500">
-        Select a chat
-      </div>
-    );
-  }
+  // ✅ SAFE EMPTY STATE
+ if (!chat) {
+  return (
+    <div className="flex-1 flex items-center justify-center text-gray-500">
+      Select a chat to start messaging
+    </div>
+  );
+}
+
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col bg-gray-50">
+      {/* Messages */}
       <div className="flex-1 p-4 overflow-y-auto">
-        {messages.map(m => (
+        {messages.map((msg) => (
           <MessageBubble
-            key={m._id}
-            text={m.content}
-            isOwn={
-              m.sender._id === JSON.parse(localStorage.getItem("user"))._id
-            }
+            key={msg._id}
+            text={msg.content}
+            isOwn={msg.sender._id === loggedUser._id}
           />
         ))}
       </div>
 
-      <form onSubmit={sendMessage} className="p-4 flex gap-2 border-t">
+      {/* Input */}
+      <form
+        onSubmit={sendMessage}
+        className="p-4 flex gap-2 border-t bg-white"
+      >
         <input
           value={text}
-          onChange={e => setText(e.target.value)}
-          className="flex-1 border rounded-full px-4 py-2"
-          placeholder="Type a message"
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Type a message..."
+          className="flex-1 border rounded-full px-4 py-2 outline-none"
         />
-        <button className="bg-indigo-600 text-white px-6 rounded-full">
+        <button
+          type="submit"
+          className="bg-indigo-600 text-white px-6 rounded-full"
+        >
           Send
         </button>
       </form>
