@@ -19,7 +19,7 @@ const ChatWindow = ({ chat }) => {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          }
+          },
         );
 
         const data = await res.json();
@@ -58,14 +58,13 @@ const ChatWindow = ({ chat }) => {
   };
 
   // ✅ SAFE EMPTY STATE
- if (!chat) {
-  return (
-    <div className="flex-1 flex items-center justify-center text-gray-500">
-      Select a chat to start messaging
-    </div>
-  );
-}
-
+  if (!chat) {
+    return (
+      <div className="flex-1 flex items-center justify-center text-gray-500">
+        Select a chat to start messaging
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col bg-gray-50">
@@ -76,15 +75,13 @@ const ChatWindow = ({ chat }) => {
             key={msg._id}
             text={msg.content}
             isOwn={msg.sender._id === loggedUser._id}
+            createdAt={msg.createdAt} // 👈 ADD THIS
           />
         ))}
       </div>
 
       {/* Input */}
-      <form
-        onSubmit={sendMessage}
-        className="p-4 flex gap-2 border-t bg-white"
-      >
+      <form onSubmit={sendMessage} className="p-4 flex gap-2 border-t bg-white">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}

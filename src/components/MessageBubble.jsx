@@ -1,4 +1,11 @@
-const MessageBubble = ({ text, isOwn }) => {
+const MessageBubble = ({ text, isOwn, createdAt }) => {
+  const time = createdAt
+    ? new Date(createdAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
+
   return (
     <div
       className={`max-w-xs mb-3 px-4 py-2 rounded-xl ${
@@ -7,7 +14,15 @@ const MessageBubble = ({ text, isOwn }) => {
           : "mr-auto bg-white text-gray-800 border"
       }`}
     >
-      {text}
+      <p className="break-words">{text}</p>
+
+      <div
+        className={`mt-1 text-xs text-right ${
+          isOwn ? "text-indigo-200" : "text-gray-400"
+        }`}
+      >
+        {time}
+      </div>
     </div>
   );
 };

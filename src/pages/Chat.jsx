@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import ChatList from "../components/ChatList";
 import ChatWindow from "../components/ChatWindow";
@@ -30,9 +30,28 @@ const Chat = () => {
       return exists ? prev : [chat, ...prev];
     });
 
-    setSelectedChat(chat);   // ✅ CHAT WINDOW OPENS
-    setShowModal(false);     // ✅ MODAL CLOSES
+    setSelectedChat(chat); // ✅ CHAT WINDOW OPENS
+    setShowModal(false); // ✅ MODAL CLOSES
   };
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/chats", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        setChats(data);
+      } catch (err) {
+        console.error("Failed to fetch chats", err);
+      }
+    };
+
+    fetchChats();
+  }, []);
 
   return (
     <div className="flex h-screen">
