@@ -2,12 +2,27 @@ import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ onNewChat }) => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+
+  // ✅ ADD THIS SAFE GUARD (minimal change)
+  let user = null;
+  try {
+    const storedUser = localStorage.getItem("user");
+    user = storedUser ? JSON.parse(storedUser) : null;
+  } catch (err) {
+    user = null;
+  }
 
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
   };
+
+  // ✅ OPTIONAL SAFETY: if user missing, logout silently
+  if (!user) {
+    localStorage.clear();
+    navigate("/");
+    return null;
+  }
 
   return (
     <div className="w-72 bg-indigo-600 text-white flex flex-col">
@@ -20,7 +35,7 @@ const Sidebar = ({ onNewChat }) => {
       {/* New Chat Button */}
       <div className="p-3">
         <button
-          onClick={onNewChat}   // ✅ ONLY THIS
+          onClick={onNewChat}   // ✅ unchanged
           className="w-full py-2 bg-indigo-500 rounded hover:bg-indigo-700"
         >
           + New Chat
@@ -35,6 +50,10 @@ const Sidebar = ({ onNewChat }) => {
         >
           Logout
         </button>
+      </div>
+
+      <div className="p-3 text-center text-xs opacity-70">
+        <h4>© 2026 JabberBox. | All rights reserved</h4>
       </div>
     </div>
   );

@@ -1,5 +1,21 @@
 const ChatList = ({ chats = [], selectedChat, onSelectChat }) => {
-  const loggedUser = JSON.parse(localStorage.getItem("user"));
+  // ✅ SAFE localStorage parse (added)
+  let loggedUser = null;
+  try {
+    const storedUser = localStorage.getItem("user");
+    loggedUser = storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    loggedUser = null;
+  }
+
+  // ✅ Guard against invalid chats
+  if (!Array.isArray(chats)) {
+    return (
+      <div className="w-80 bg-white border-r border-gray-200 flex items-center justify-center text-gray-500">
+        No chats found
+      </div>
+    );
+  }
 
   return (
     <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto text-gray-800">
@@ -12,10 +28,10 @@ const ChatList = ({ chats = [], selectedChat, onSelectChat }) => {
       )}
 
       {chats.map((chat) => {
-        // 🔥 find the other user
-        const otherUser = chat.users?.find(
-          (u) => u._id !== loggedUser._id
-        );
+        // 🔥 find the other user (SAFE)
+        const otherUser = loggedUser
+          ? chat.users?.find((u) => u._id !== loggedUser._id)
+          : null;
 
         return (
           <div
@@ -30,10 +46,6 @@ const ChatList = ({ chats = [], selectedChat, onSelectChat }) => {
             <div className="font-medium text-gray-900">
               {otherUser?.name || "Unknown User"}
             </div>
-
-            {/* <div className="text-sm text-gray-600">
-              {otherUser?.email || ""}
-            </div> */}
           </div>
         );
       })}

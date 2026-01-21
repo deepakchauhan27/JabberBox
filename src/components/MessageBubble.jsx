@@ -14,7 +14,7 @@ const MessageBubble = ({ text, isOwn, createdAt }) => {
           : "mr-auto bg-white text-gray-800 border"
       }`}
     >
-      <p className="break-words">{text}</p>
+      <p className="wrap-break-words">{text}</p>
 
       <div
         className={`mt-1 text-xs text-right ${

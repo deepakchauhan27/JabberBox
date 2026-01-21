@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../images/Jabberbox_logo_new.png"
+import logo from "../images/Jabberbox_logo_new.png";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -10,50 +10,58 @@ const Register = () => {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false); // ✅ added
+  const [error, setError] = useState(""); // ✅ added
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-  try {
-    const response = await fetch("http://localhost:5000/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`, // ✅ env URL
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        },
+      );
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      alert(data.message || "Registration failed");
-      return;
+      if (!response.ok) {
+        setError(data.message || "Registration failed");
+        return;
+      }
+
+      // ✅ OPTIONAL: store token if backend sends it
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      // ✅ IMPORTANT: DO NOT store user here unless backend returns data.user
+      // Registration → redirect to login
+      navigate("/");
+    } catch (error) {
+      setError("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-
-    // ✅ Success
-    console.log("Registered:", data);
-
-    // Optional: store token
-    localStorage.setItem("token", data.token);
-
-    // Redirect to login (or chat later)
-    navigate("/");
-  } catch (error) {
-    console.error("Error:", error);
-    alert("Something went wrong");
-  }
-};
-
+  };
 
   return (
     <div className="min-h-screen flex items-center flex-row justify-center bg-linear-to-br from-indigo-600 via-purple-600 to-pink-500">
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 
-      {/* {Logo} */}
+      {/* Logo */}
       <div className="absolute top-10 left-10">
         <img className="h-20" src={logo} alt="JabberBox Logo" />
       </div>
@@ -66,6 +74,11 @@ const Register = () => {
         <p className="text-center text-gray-500 mt-2">
           Join <span className="font-semibold text-indigo-600">JabberBox</span>
         </p>
+
+        {/* ✅ Error message */}
+        {error && (
+          <p className="text-red-500 text-sm text-center mt-3">{error}</p>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <input
@@ -100,9 +113,14 @@ const Register = () => {
 
           <button
             type="submit"
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition"
+            disabled={loading}
+            className={`w-full py-3 text-white rounded-xl font-semibold transition ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700"
+            }`}
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
