@@ -13,7 +13,7 @@ const Chat = () => {
 
   // 🔥 THIS FUNCTION OPENS CHAT WINDOW
   const openChatWithUser = async (user) => {
-    const res = await fetch("http://localhost:5000/api/chats", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/chats`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
