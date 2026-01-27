@@ -23,13 +23,16 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       const data = await response.json();
 
@@ -41,7 +44,7 @@ const Login = () => {
 
       // ✅ Success
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       // Redirect to chat page (create later)
       navigate("/chat");
@@ -54,7 +57,6 @@ const Login = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500">
-      
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 
@@ -70,13 +72,12 @@ const Login = () => {
         </h2>
 
         <p className="text-center text-gray-500 mt-2">
-          Login to <span className="font-semibold text-indigo-600">JabberBox</span>
+          Login to{" "}
+          <span className="font-semibold text-indigo-600">JabberBox</span>
         </p>
 
         {error && (
-          <p className="text-red-500 text-sm text-center mt-3">
-            {error}
-          </p>
+          <p className="text-red-500 text-sm text-center mt-3">{error}</p>
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -130,5 +131,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
