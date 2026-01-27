@@ -44,7 +44,7 @@ const Login = () => {
 
       // ✅ Success
       localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data));
 
       // Redirect to chat page (create later)
       navigate("/chat");
