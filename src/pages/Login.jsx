@@ -56,7 +56,7 @@ const Login = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-500 via-teal-500 to-emerald-500">
+    <div className="relative min-h-screen flex items-center justify-center bg-linear-to-br from-cyan-500 via-teal-500 to-emerald-500">
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 

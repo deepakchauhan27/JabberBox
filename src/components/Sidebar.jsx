@@ -26,6 +26,9 @@ const Sidebar = ({ onNewChat }) => {
 
   return (
     <div className="w-72 bg-indigo-600 text-white flex flex-col">
+      <div className="p-4 border-b border-indigo-500 text-center font-bold text-2xl">
+        <h1>JabberBox</h1>
+      </div>
       {/* User Info */}
       <div className="p-4 border-b border-indigo-500">
         <p className="font-semibold text-lg">{user?.name}</p>

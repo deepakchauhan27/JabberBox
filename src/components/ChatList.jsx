@@ -19,7 +19,7 @@ const ChatList = ({ chats = [], selectedChat, onSelectChat }) => {
 
   return (
     <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto text-gray-800">
-      <div className="p-4 text-xl font-semibold border-b">
+      <div className="p-4 text-xl font-semibold bg-indigo-600 text-white border-b">
         Chats
       </div>
 
